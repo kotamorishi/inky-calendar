@@ -1,75 +1,104 @@
 #!/usr/bin/env python3
-
+from os import path, DirEntry
 import sys
 import math
 import calendar
 from datetime import date
+from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from inky.inky_uc8159 import Inky
+from inky.inky_uc8159 import Inky, BLACK, WHITE, GREEN, RED, YELLOW, ORANGE, BLUE
 
 inky = Inky()
-saturation = 0.6
+saturation = 0.5
+
+# latest update timestamp.
+latest_calendar_update = datetime.now() # no need to set current time, just for initial.
 
 class dayInfo:
-    def __init__(self, image, date, rect=(0,0, 100,100), borderColor=(0,0,0), fillColor=(255,255,255)):
+    def __init__(self, image, date, rect=(0,0, 100,100), borderColor=(0,0,0), fillColor=(255,255,255), events=[]):
         self.image = image
         self.date = date
         self.rect = rect
         self.borderColor = borderColor
         self.fillColor = fillColor
         self.emphsize = False
-        self.scheduleItems = []
-    def addList(shortText, longText):
-        pass
+        self.events = events
+        self.specialImage = None
 
-def drawCalendar(image, borderColor=(0,0,0), fillColor=(255,255,255)):
+def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(255,255,255)):
 
+    # Calc the calendar box(day) size.
     width, height = image.size
-    boxWidth = math.floor(width / 8) + 5
-    boxHeight = math.floor(height / 7) + 6
+    boxWidth = math.floor(width / 8) + 8
+    boxHeight = math.floor(height / 7) + 7
 
-    c = calendar.TextCalendar(calendar.MONDAY)
-    today = date.today()
-    c.prmonth(today.year, today.month)
+    cal = calendar.Calendar()
+
+    # Target year and month 
+    targetYear = targetDate.year
+    targetMonth = targetDate.month
+    weeks = cal.monthdatescalendar(targetYear, targetMonth)
+
+    # Offset calendar from top(Y) and left(X)
+    offsetX = 10
+    offsetY = 40
+
+    # Title label offset from screen edge.
+    titleOffsetY = 0
+    calendarRow = 0
+
+    # Check weeks in the calendar, if 6, offset a bit
+    # If less than 6 weeks, increase box height.
+    if len(weeks) >= 6:
+        offsetY = 15
+        titleOffsetY = 12
+    else:        
+        boxHeight = boxHeight + 6
 
     draw = ImageDraw.Draw(image)
     dateFont = ImageFont.truetype("fonts/Roboto-BlackItalic.ttf", 36)
-    weekDayFont = ImageFont.truetype("fonts/Roboto-BlackItalic.ttf", 16)
-    dateString = today.strftime("%B %d")
-    weekdayString = today.strftime("%A")
+    dateString = targetDate.strftime("%B %d, %Y")
+    weekdayString = targetDate.strftime("%A")
 
-    draw.text((20, 15), dateString, (50,50,50),font=dateFont)
-    #draw.text((width - 140, 20), weekdayString, (50,50,50),font=weekDayFont)
+    # update title for the other month
+    if date.today() != targetDate:
+        dateString = targetDate.strftime("%B %Y") # December 2021
 
-    cal = calendar.Calendar()
-    weeks = cal.monthdatescalendar(today.year, today.month)
-    offsetX = 20
-    offsetY = 60
-    calendarRow = 0
+    draw.text((12, titleOffsetY), dateString, (0,0,0),font=dateFont)
+
     for days in weeks:
         xIndex = 0 
         for day in days:
             fillColor = (255, 255, 255) # defaulting the box background color
+            eventList = [] # blank..
+
             info = dayInfo(image, day, (
                 boxWidth * xIndex + offsetX, # starting point of x
                 boxHeight * calendarRow + offsetY, # starting point of y
                 boxWidth * xIndex + offsetX + boxWidth, # ending point of x
                 boxHeight * calendarRow + offsetY + boxHeight), # ending point of y
                 borderColor=(0,0,0),
-                fillColor=fillColor)
+                fillColor=fillColor,
+                events=eventList)
 
             if(day.weekday() == 5): # Sat
-                info.fillColor = (228, 228, 255)
+                info.fillColor = (255, 200, 200)
             if(day.weekday() == 6): # Sun
-                info.fillColor = (250, 200, 200)
+                info.fillColor = (255, 200, 200)
 
-            if(today == day): # today
-                info.fillColor = (250, 229, 117)
+            if(date.today() == day): # today
+                #info.fillColor = (250, 229, 117)
                 info.emphsize = True            
             
-            if(day.month == today.month):
-                # draw box when month is matching to current month.
+            # draw box when month is matching to current month.
+            if(day.month == targetMonth):
+
+                # check if there is special image for the day. (If you wish to use jpeg format, change here.)
+                pathOfImage = 'images/special_days/'+ day.strftime("%m%d") + ".png"
+                if path.isfile(pathOfImage) == True:
+                    info.specialImage = pathOfImage
+
                 drawBox(info)
 
             xIndex = xIndex + 1
@@ -77,22 +106,53 @@ def drawCalendar(image, borderColor=(0,0,0), fillColor=(255,255,255)):
         calendarRow = calendarRow + 1
 
 def drawBox(info):
-    draw = ImageDraw.Draw(info.image)
-    font = ImageFont.truetype("fonts/Roboto-Medium.ttf", 14)
-    draw.rectangle(info.rect, fill=info.fillColor, outline=info.borderColor)
-    #if(info.emphsize == True):
-    #    draw.ellipse((info.rect[0] + 1, info.rect[1] + 1, info.rect[0] + 2 + 20, info.rect[1] + 2 + 20), fill = 'red', outline ='red')
+    draw = ImageDraw.Draw(info.image, "RGBA")
 
-    draw.text((info.rect[0] + 4, info.rect[1] + 4), str(info.date.day) , (60,60,60),font=font)
+    # if user put a images under images/special_days/MMDD.png, draw it on the box.
+    if info.specialImage != None:
+        draw.rectangle(info.rect, fill=(255,255,255,255), outline=(0,0,0,255))
+        dayImage = Image.open(info.specialImage)
+        # crop the image to adjust the box.
+        dayImage = dayImage.crop((0,0, info.rect[2] - info.rect[0] - 1, info.rect[3] - info.rect[1] - 1))
+        info.image.paste(dayImage, (info.rect[0] + 1, info.rect[1] + 1))
+        return
+    
+    dayFont = ImageFont.truetype("fonts/Roboto-Black.ttf", 16)
+    timeFont = ImageFont.truetype("fonts/Roboto-Black.ttf", 12)
+    eventFont = ImageFont.truetype("fonts/Roboto-Black.ttf", 12)
+
+    # if there is no event on the day
+    fillColor = (info.fillColor[0], info.fillColor[1], info.fillColor[2], 160)
+    if(len(info.events) != 0):
+        fillColor = (info.fillColor[0], info.fillColor[1], info.fillColor[2], 255)
+    draw.rectangle(info.rect, fill=fillColor, outline=info.borderColor)
+
+    # offset for events
+    offsetY = 20
+    if(info.emphsize == True):
+        draw.rectangle((info.rect[0] + 1, info.rect[1] + 1, info.rect[2] - 1, info.rect[1] + 22), fill=(0,0,0,255), outline=YELLOW)
+        draw.text((info.rect[0] + 6, info.rect[1] + 4), str(info.date.day) , (255,255,255,255),font=dayFont)
+    else:
+        draw.text((info.rect[0] + 6, info.rect[1] + 4), str(info.date.day) , (0,0,0, 255),font=dayFont)
     #print("day : " + str(info.date.day) + " pos x:" + str(info.rect[0]) + " y:" + str(info.rect[1]) + " height " + str(info.rect[2]) + " width " + str(info.rect[3]))
+    if(len(info.events) != 0):
+        for ev in info.events:
+            draw.text((info.rect[0] + 4, info.rect[1] + offsetY), str(ev.start.hour) , (60,60,60),font=timeFont)
+            draw.text((info.rect[0] + 4 + 16, info.rect[1] + offsetY), ev.title , (0,0,0),font=eventFont)
+            offsetY = offsetY + 16
 
 
-background = Image.open("background.jpg")
-foreground = Image.open("title_cover.png")
-background.paste(foreground, (0, 0), foreground)
+def update():
+    background = Image.open("images/background.jpg")
+    foreground = Image.open("images/title_cover.png") # cover top white thing
+    background.paste(foreground, (0, 0), foreground)
+    drawCalendar(background) # draw calendar
+    #drawCalendar(background, targetDate=date(2021, 5, 1)) # draw calendar with specific date
+    background.save("temp.png") # save the file for refrence
 
-drawCalendar(background)
-background.save("temp.png")
+    # update inky impression
+    inky.set_image(background, saturation=saturation)
+    inky.show()
 
-inky.set_image(background, saturation=saturation)
-inky.show()
+# Run this script every day 0:00 by cron or sleep for 24 hours.
+update()
