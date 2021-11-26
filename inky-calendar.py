@@ -171,11 +171,11 @@ def update():
     #drawCalendar(background, targetDate=date(2021, 5, 1)) # 6 row
     
     # if you wish to save it.
-    background.save("temp.png")
+    # background.save("temp.png")
 
     # update inky impression
-    #inky.set_image(background, saturation=saturation)
-    #inky.show()
+    inky.set_image(background, saturation=saturation)
+    inky.show()
 
 # Loop it every day.
 update()
