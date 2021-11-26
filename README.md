@@ -40,3 +40,6 @@ https://fonts.google.com/specimen/Roboto?query=robo#standard-styles
 
 Example image for Nov 1st(CC0 License)
 https://www.svgrepo.com/svg/75632/mountain
+
+Background image
+https://www.pexels.com/photo/green-leaf-plant-on-pot-824572/
