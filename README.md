@@ -34,7 +34,9 @@ Script will load your picture of the day.
 The file name should be MMDD.png
 If the file for Jan 24, file name should be "0124.png".
 
-# Fonts
+# Fonts and images
 This project use Roboto font under Apache v2 license.
 https://fonts.google.com/specimen/Roboto?query=robo#standard-styles
 
+Example image for Nov 1st(CC0 License)
+https://www.svgrepo.com/svg/75632/mountain
