@@ -32,10 +32,7 @@ Script will load your picture of the day.
 ![lib directory contents](/images/special_days/example.png)
 
 The file name should be MMDD.png
-
-e.g.
-Oct 24 -> 1024.png
-
+If the file for Jan 24, file name should be "0124.png".
 
 # Fonts
 This project use Roboto font under Apache v2 license.
