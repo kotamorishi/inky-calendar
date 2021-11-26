@@ -42,7 +42,7 @@ def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(
 
     # Offset calendar from top(Y) and left(X)
     offsetX = 10
-    offsetY = 40
+    offsetY = 45
 
     # Title label offset from screen edge.
     titleOffsetY = 0
@@ -53,7 +53,11 @@ def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(
     if len(weeks) >= 6:
         offsetY = 15
         titleOffsetY = 12
-    else:        
+    elif len(weeks) == 4:
+        offsetY = 65
+        titleOffsetY = 12
+        boxHeight = boxHeight + 12
+    else:
         boxHeight = boxHeight + 6
 
     draw = ImageDraw.Draw(image)
@@ -83,7 +87,7 @@ def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(
                 events=eventList)
 
             if(day.weekday() == 5): # Sat
-                info.fillColor = (255, 200, 200)
+                info.fillColor = (200, 200, 255)
             if(day.weekday() == 6): # Sun
                 info.fillColor = (255, 200, 200)
 
@@ -95,7 +99,19 @@ def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(
             if(day.month == targetMonth):
 
                 # check if there is special image for the day. (If you wish to use jpeg format, change here.)
+
+                # image for every month
+                pathOfImage = 'images/special_days/'+ day.strftime("%d") + ".png"
+                if path.isfile(pathOfImage) == True:
+                    info.specialImage = pathOfImage
+
+                # image for specific month
                 pathOfImage = 'images/special_days/'+ day.strftime("%m%d") + ".png"
+                if path.isfile(pathOfImage) == True:
+                    info.specialImage = pathOfImage
+
+                # image for specific year and month
+                pathOfImage = 'images/special_days/'+ day.strftime("%Y%m%d") + ".png"
                 if path.isfile(pathOfImage) == True:
                     info.specialImage = pathOfImage
 
@@ -146,13 +162,20 @@ def update():
     background = Image.open("images/background.jpg")
     foreground = Image.open("images/title_cover.png") # cover top white thing
     background.paste(foreground, (0, 0), foreground)
-    drawCalendar(background) # draw calendar
-    #drawCalendar(background, targetDate=date(2021, 5, 1)) # draw calendar with specific date
-    background.save("temp.png") # save the file for refrence
+
+    # draw calendar
+    #drawCalendar(background)
+
+    # draw calendar with specific date
+    drawCalendar(background, targetDate=date(2022, 11, 1)) # 4 row
+    #drawCalendar(background, targetDate=date(2021, 5, 1)) # 6 row
+    
+    # if you wish to save it.
+    background.save("temp.png")
 
     # update inky impression
-    inky.set_image(background, saturation=saturation)
-    inky.show()
+    #inky.set_image(background, saturation=saturation)
+    #inky.show()
 
-# Run this script every day 0:00 by cron or sleep for 24 hours.
+# Loop it every day.
 update()
