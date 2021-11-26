@@ -31,8 +31,14 @@ Script will load your picture of the day.
 
 ![lib directory contents](/images/special_days/example.png)
 
-The file name should be MMDD.png
-If the file for Jan 24, file name should be "0124.png".
+### Every month of the day.
+For every month 1st day, file name should be "01.png"(DD)
+
+### Specific month of the day.
+For Jan 24, file name should be "0124.png".(MMDD)
+
+### Specific year and month of the day.
+For Jan 1st, 2022, file name should be "20220101.png"(YYYYMMDD)
 
 # Fonts and images
 This project use Roboto font under Apache v2 license.
