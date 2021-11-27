@@ -23,6 +23,7 @@ The calendar API returns latest update time.
 python3 inky-gcalendar.py
 ```
 
-When the first run, you might need to open up the browse for authorization. once you obtain the access to your calendar, this script save the token into ```token.json``` 
+When the first run, you might need to open up the browser for authorization.
+Once you obtain the access to your calendar, this script save the token into ```token.json``` 
 
 NOTE : If someone got your "token.json" file, they can access to your calender.
