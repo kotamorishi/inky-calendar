@@ -25,6 +25,10 @@ cd inky-calendar
 python3 inky-calendar.py
 ```
 
+# Background image
+Program automatically load ```images/background.jpg``` for the background.
+if you wish to change, update the image.
+
 # Day of the picture
 Create image at least 85 x 85 in png format and place it under ```images/special_days``` folder.
 Script will load your picture of the day.
