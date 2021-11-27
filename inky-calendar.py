@@ -12,6 +12,10 @@ from inky.inky_uc8159 import Inky, BLACK, WHITE, GREEN, RED, YELLOW, ORANGE, BLU
 inky = Inky()
 saturation = 0.5
 
+# font files
+titleFontFile = "fonts/Roboto-BlackItalic.ttf"
+detailFontFile = "fonts/Roboto-Black.ttf"
+
 # latest update timestamp.
 latest_calendar_update = datetime.now() # no need to set current time, just for initial.
 
@@ -61,7 +65,7 @@ def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(
         boxHeight = boxHeight + 6
 
     draw = ImageDraw.Draw(image)
-    dateFont = ImageFont.truetype("fonts/Roboto-BlackItalic.ttf", 36)
+    dateFont = ImageFont.truetype(titleFontFile, 36)
     dateString = targetDate.strftime("%B %d, %Y")
     weekdayString = targetDate.strftime("%A")
 
@@ -133,9 +137,9 @@ def drawBox(info):
         info.image.paste(dayImage, (info.rect[0] + 1, info.rect[1] + 1))
         return
     
-    dayFont = ImageFont.truetype("fonts/Roboto-Black.ttf", 16)
-    timeFont = ImageFont.truetype("fonts/Roboto-Black.ttf", 12)
-    eventFont = ImageFont.truetype("fonts/Roboto-Black.ttf", 12)
+    dayFont = ImageFont.truetype(detailFontFile, 16)
+    timeFont = ImageFont.truetype(detailFontFile, 12)
+    eventFont = ImageFont.truetype(detailFontFile, 12)
 
     # if there is no event on the day
     fillColor = (info.fillColor[0], info.fillColor[1], info.fillColor[2], 160)
@@ -164,14 +168,15 @@ def update():
     background.paste(foreground, (0, 0), foreground)
 
     # draw calendar
-    #drawCalendar(background)
+    drawCalendar(background)
 
     # draw calendar with specific date
-    drawCalendar(background, targetDate=date(2022, 11, 1)) # 4 row
-    #drawCalendar(background, targetDate=date(2021, 5, 1)) # 6 row
+    #drawCalendar(background, targetDate=date(2021, 2, 1)) # 4 row
+    #drawCalendar(background, targetDate=date(2022, 7, 1)) # 6 row
+    #drawCalendar(background, targetDate=date(2022, 7, 1)) # open space top left
     
     # if you wish to save it.
-    # background.save("temp.png")
+    #background.save("temp.png")
 
     # update inky impression
     inky.set_image(background, saturation=saturation)
