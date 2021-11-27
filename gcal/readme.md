@@ -1,5 +1,8 @@
 This folder contains Google calendar integration.
 
+![lib directory contents](/gcal/sample.png)
+
+
 Steps
 
 # 1.Set up your google calendar.
