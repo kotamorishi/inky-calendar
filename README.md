@@ -50,6 +50,7 @@ https://fonts.google.com/specimen/Roboto?query=robo#standard-styles
 
 Example image for Nov 1st(CC0 License)
 https://www.svgrepo.com/svg/75632/mountain
+Also most of ```special_days``` images too.
 
 Background image
 https://www.pexels.com/photo/green-leaf-plant-on-pot-824572/
