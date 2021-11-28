@@ -30,6 +30,84 @@ class dayInfo:
         self.events = events
         self.specialImage = None
 
+def drawTitle(image, targetDate, calendarRows):
+
+    titleOffsetX = 10
+    titleOffsetY = 12
+
+    draw = ImageDraw.Draw(image)
+    monthString = targetDate.strftime("%B")
+    yearString = targetDate.strftime("%Y")
+    #weekdayString = targetDate.strftime("%A")
+    if date.today() == targetDate:
+        monthString = targetDate.strftime("%B %d")
+
+
+    titleTextAnchor = "la"
+    fitstDayOfTheMonth = date(year=targetDate.year, month=targetDate.month, day=1)
+    # When the first day of the month starts after wednesday, enlarge the title.
+
+    if fitstDayOfTheMonth.weekday() == 0:
+        
+        monthFont = ImageFont.truetype(titleFontFile, 56)
+        yearFont = ImageFont.truetype(titleFontFile, 32)
+        # Calendar move to the top 
+        offsetY = 14
+        titleOffsetY = 435
+        titleOffsetX = 580
+        titleTextAnchor = "rd"
+
+        if calendarRows == 4:
+            titleOffsetY = 445
+
+        # split it to 2 rows
+        draw.text((titleOffsetX, titleOffsetY - 30), monthString, (0,0,0),font=monthFont, anchor=titleTextAnchor)
+        draw.text((titleOffsetX, titleOffsetY), yearString, (0,0,0),font=yearFont, anchor=titleTextAnchor)
+
+    elif fitstDayOfTheMonth.weekday() <= 3:
+        titleOffsetY = 40
+        titleYearOffsetY = 0
+
+        monthFont = ImageFont.truetype(titleFontFile, 32)
+        yearFont = ImageFont.truetype(titleFontFile, 24)
+
+        if fitstDayOfTheMonth.weekday() == 2:
+            titleOffsetY = 50
+            titleYearOffsetY = 10
+            monthFont = ImageFont.truetype(titleFontFile, 36)
+            yearFont = ImageFont.truetype(titleFontFile, 28)
+            
+
+        if fitstDayOfTheMonth.weekday() == 3:
+            titleOffsetY = 55
+            titleYearOffsetY = 6
+            monthFont = ImageFont.truetype(titleFontFile, 46)
+            yearFont = ImageFont.truetype(titleFontFile, 28)
+            
+
+
+        # split it to 2 rows
+        draw.text((titleOffsetX, titleOffsetY - monthFont.size), monthString, (0,0,0),font=monthFont, anchor=titleTextAnchor)
+        draw.text((titleOffsetX, titleOffsetY + titleYearOffsetY), yearString, (0,0,0),font=yearFont, anchor=titleTextAnchor)
+    else:
+        fontSize = 48
+        titleOffsetX = 20
+        # also weeks are 5 row, add more space for the title.
+        if calendarRows == 5:
+            titleOffsetY = 15
+            fontSize = 54
+        # when the weeks are 6 row
+        if calendarRows == 6:
+            titleOffsetY = 0
+            fontSize = 54
+        
+        # split it to 2 rows
+        monthFont = ImageFont.truetype(titleFontFile, fontSize)
+        yearFont = ImageFont.truetype(titleFontFile, 28)
+        draw.text((titleOffsetX, titleOffsetY), monthString, (0,0,0),font=monthFont, anchor=titleTextAnchor)
+        draw.text((titleOffsetX, titleOffsetY + 56), yearString, (0,0,0),font=yearFont, anchor=titleTextAnchor)
+    
+
 def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(255,255,255)):
 
     # Calc the calendar box(day) size.
@@ -48,33 +126,25 @@ def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(
     offsetX = 10
     offsetY = 45
 
-    # Title label offset from screen edge.
-    titleOffsetY = 0
-    calendarRow = 0
-
     # Check weeks in the calendar, if 6, offset a bit
     # If less than 6 weeks, increase box height.
     if len(weeks) >= 6:
         offsetY = 15
-        titleOffsetY = 12
     elif len(weeks) == 4:
         offsetY = 65
-        titleOffsetY = 12
-        boxHeight = boxHeight + 12
+
+        boxHeight = boxHeight + 15 # add more space for 4 row calendar
     else:
         boxHeight = boxHeight + 6
 
-    draw = ImageDraw.Draw(image)
-    dateFont = ImageFont.truetype(titleFontFile, 36)
-    dateString = targetDate.strftime("%B %d, %Y")
-    weekdayString = targetDate.strftime("%A")
+    # when the first day of the month starts on monday, offset to the top.
+    if date(targetYear, targetMonth, 1).weekday() == 0:
+        offsetY = 10
 
-    # update title for the other month
-    if date.today() != targetDate:
-        dateString = targetDate.strftime("%B %Y") # December 2021
+    # Draw title
+    drawTitle(image=image, targetDate=targetDate, calendarRows=len(weeks))
 
-    draw.text((12, titleOffsetY), dateString, (0,0,0),font=dateFont)
-
+    calendarRow = 0
     for days in weeks:
         xIndex = 0 
         for day in days:
@@ -150,7 +220,7 @@ def drawBox(info):
     # offset for events
     offsetY = 20
     if(info.emphsize == True):
-        draw.rectangle((info.rect[0] + 1, info.rect[1] + 1, info.rect[2] - 1, info.rect[1] + 22), fill=(0,0,0,255), outline=YELLOW)
+        draw.rectangle((info.rect[0] + 1, info.rect[1] + 1, info.rect[2] - 1, info.rect[1] + 22), fill=(0,0,0,255), outline=(0,0,0,255))
         draw.text((info.rect[0] + 6, info.rect[1] + 4), str(info.date.day) , (255,255,255,255),font=dayFont)
     else:
         draw.text((info.rect[0] + 6, info.rect[1] + 4), str(info.date.day) , (0,0,0, 255),font=dayFont)
@@ -168,19 +238,26 @@ def update():
     background.paste(foreground, (0, 0), foreground)
 
     # draw calendar
-    drawCalendar(background)
+    drawCalendar(background) 
+    # if you wish to save the image.
+    #background.save("jul.png")
 
-    # draw calendar with specific date
-    #drawCalendar(background, targetDate=date(2021, 2, 1)) # 4 row
-    #drawCalendar(background, targetDate=date(2022, 7, 1)) # 6 row
-    #drawCalendar(background, targetDate=date(2022, 7, 1)) # open space top left
-    
-    # if you wish to save it.
-    #background.save("temp.png")
 
     # update inky impression
     inky.set_image(background, saturation=saturation)
     inky.show()
 
-# Loop it every day.
+# generate calendar images for the year, this frunction is just for fun.
+def justForFun(year):
+    for i in range(1,13):
+        targetDate=date(year, i, 28)
+
+        background = Image.open("images/background.jpg")
+        foreground = Image.open("images/title_cover.png") # cover top white thing
+        background.paste(foreground, (0, 0), foreground)
+        drawCalendar(background, targetDate=targetDate) # open space top left
+        month = targetDate.strftime("%B")
+        background.save("2021/" + month + ".png")
+
+# Loop it every day by cron job 
 update()
