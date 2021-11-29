@@ -30,7 +30,7 @@ class dayInfo:
         self.events = events
         self.specialImage = None
 
-def drawTitle(image, targetDate, calendarRows):
+def drawTitle(image, targetDate, calendarRows, boxSize):
 
     titleOffsetX = 10
     titleOffsetY = 12
@@ -85,10 +85,27 @@ def drawTitle(image, targetDate, calendarRows):
             yearFont = ImageFont.truetype(titleFontFile, 28)
             
 
-
         # split it to 2 rows
         draw.text((titleOffsetX, titleOffsetY - monthFont.size), monthString, (0,0,0),font=monthFont, anchor=titleTextAnchor)
-        draw.text((titleOffsetX, titleOffsetY + titleYearOffsetY), yearString, (0,0,0),font=yearFont, anchor=titleTextAnchor)
+
+        
+        if fitstDayOfTheMonth.weekday() == 1:
+            draw.text((titleOffsetX, titleOffsetY + 56), yearString, (0,0,0),font=yearFont, anchor=titleTextAnchor)
+            
+            dayFont = ImageFont.truetype(titleFontFile, 56)
+            if date.today() == targetDate:
+                draw.text((titleOffsetX, titleOffsetY), str(targetDate.day), (0,0,0),font=dayFont, anchor=titleTextAnchor)
+        elif fitstDayOfTheMonth.weekday() == 2:
+            titlePosX = boxSize[0] * 2
+            draw.text((titlePosX, titleOffsetY + 56), yearString, (0,0,0),font=yearFont, anchor="rb")
+            
+            dayFont = ImageFont.truetype(titleFontFile, 56)
+            if date.today() == targetDate:
+                draw.text((titleOffsetX, titleOffsetY), str(targetDate.day), (0,0,0),font=dayFont, anchor=titleTextAnchor)
+        else:
+            titlePosX = boxSize[0] * fitstDayOfTheMonth.weekday()
+            draw.text((titlePosX, titleOffsetY + titleYearOffsetY), yearString, (0,0,0),font=yearFont, anchor="ra")
+
     else:
         fontSize = 48
         titleOffsetX = 20
@@ -106,6 +123,8 @@ def drawTitle(image, targetDate, calendarRows):
         yearFont = ImageFont.truetype(titleFontFile, 28)
         draw.text((titleOffsetX, titleOffsetY), monthString, (0,0,0),font=monthFont, anchor=titleTextAnchor)
         draw.text((titleOffsetX, titleOffsetY + 56), yearString, (0,0,0),font=yearFont, anchor=titleTextAnchor)
+
+
     
 
 def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(255,255,255)):
@@ -142,7 +161,7 @@ def drawCalendar(image, targetDate=date.today(),borderColor=(0,0,0), fillColor=(
         offsetY = 10
 
     # Draw title
-    drawTitle(image=image, targetDate=targetDate, calendarRows=len(weeks))
+    drawTitle(image=image, targetDate=targetDate, calendarRows=len(weeks), boxSize=(boxWidth, boxHeight))
 
     calendarRow = 0
     for days in weeks:
@@ -252,12 +271,14 @@ def justForFun(year):
     for i in range(1,13):
         targetDate=date(year, i, 28)
 
-        background = Image.open("images/background.jpg")
+        background = Image.open("images/white.png")
         foreground = Image.open("images/title_cover.png") # cover top white thing
         background.paste(foreground, (0, 0), foreground)
         drawCalendar(background, targetDate=targetDate) # open space top left
         month = targetDate.strftime("%B")
         background.save("2021/" + month + ".png")
+
+#justForFun(2021)
 
 # Loop it every day by cron job 
 update()
