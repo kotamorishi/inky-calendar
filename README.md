@@ -30,7 +30,7 @@ Program automatically load ```images/background.jpg``` for the background.
 if you wish to change, update the image.
 
 # Day of the picture
-Create image at least 85 x 85 in png format and place it under ```images/special_days``` folder.
+Create image at least 85px x 90px(WxH) in png format and place it under ```images/special_days``` folder.
 Script will load your picture of the day.
 
 ![lib directory contents](/images/special_days/example.png)
