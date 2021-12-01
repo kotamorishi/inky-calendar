@@ -10,6 +10,7 @@ This calendar app require "readonly".
 
 # 2.Generate credentials.json for it.
 NEVER share the file with anyone.
+place the ```credentials.json``` under gcal folder.
 
 # 3.Install dependencies
 Run these 2 commands.
