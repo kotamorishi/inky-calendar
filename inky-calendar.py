@@ -39,8 +39,8 @@ def drawTitle(image, targetDate, calendarRows, boxSize):
     monthString = targetDate.strftime("%B")
     yearString = targetDate.strftime("%Y")
     #weekdayString = targetDate.strftime("%A")
-    if date.today() == targetDate:
-        monthString = targetDate.strftime("%B %d")
+    #if date.today() == targetDate:
+    #    monthString = targetDate.strftime("%B %d")
 
 
     titleTextAnchor = "la"
