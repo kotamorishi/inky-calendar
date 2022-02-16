@@ -252,8 +252,8 @@ def drawBox(info):
 
 
 def update():
-    background = Image.open("images/background.jpg")
-    foreground = Image.open("images/title_cover.png") # cover top white thing
+    background = Image.open("images/background.jpg").resize(inky.resolution)
+    foreground = Image.open("images/title_cover.png").resize(inky.resolution) # cover top white thing
     background.paste(foreground, (0, 0), foreground)
 
     # draw calendar
@@ -271,8 +271,8 @@ def justForFun(year):
     for i in range(1,13):
         targetDate=date(year, i, 28)
 
-        background = Image.open("images/white.png")
-        foreground = Image.open("images/title_cover.png") # cover top white thing
+        background = Image.open("images/white.png").resize(inky.resolution)
+        foreground = Image.open("images/title_cover.png").resize(inky.resolution) # cover top white thing
         background.paste(foreground, (0, 0), foreground)
         drawCalendar(background, targetDate=targetDate) # open space top left
         month = targetDate.strftime("%B")
