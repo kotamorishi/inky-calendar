@@ -1,5 +1,5 @@
 # inky-calendar
-Calendar on PIMORONI's inky impression ePaper display.
+Calendar on PIMORONI's inky impression 5.7inch ePaper display.
 
 ![lib directory contents](/images/sample.jpg)
 
